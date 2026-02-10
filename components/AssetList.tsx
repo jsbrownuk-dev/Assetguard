@@ -37,11 +37,6 @@ export const AssetList: React.FC<AssetListProps> = ({ currentUser }) => {
 
   const [disposalReason, setDisposalReason] = useState('');
 
-  const totalValue = useMemo(
-    () => assets.reduce((sum, asset) => sum + (Number.isFinite(asset.value) ? asset.value : 0), 0),
-    [assets]
-  );
-
   useEffect(() => {
     loadAssets();
   }, []);
@@ -294,6 +289,11 @@ export const AssetList: React.FC<AssetListProps> = ({ currentUser }) => {
       a.assetId.toLowerCase().includes(search.toLowerCase()) ||
       a.serialNumber.toLowerCase().includes(search.toLowerCase())
     );
+
+  const totalValue = useMemo(
+    () => filteredAssets.reduce((sum, asset) => sum + (Number.isFinite(asset.value) ? asset.value : 0), 0),
+    [filteredAssets]
+  );
 
   return (
     <div className="space-y-6">
