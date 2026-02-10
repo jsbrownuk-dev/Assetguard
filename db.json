@@ -1,0 +1,40 @@
+{
+  "assets": [
+    {
+      "id": "1770390138344-sk9t5vdmq",
+      "title": "Laptop",
+      "assetId": "687687",
+      "make": "dell",
+      "serialNumber": "7879d",
+      "location": "TRD",
+      "value": 300,
+      "createdBy": "Admin",
+      "createdAt": "2026-02-06T15:02:18.344Z",
+      "status": "active"
+    },
+    {
+      "id": "1770390138375-ve0ysanrn",
+      "title": "Office Laptop",
+      "assetId": "AS-2023-001",
+      "make": "Dell",
+      "serialNumber": "SN12345",
+      "location": "Room 101",
+      "value": 1200,
+      "createdBy": "Admin",
+      "createdAt": "2026-02-06T15:02:18.375Z",
+      "status": "active"
+    },
+    {
+      "id": "1770390138388-98f49tnsz",
+      "title": "Laptop",
+      "assetId": "788fhhh",
+      "make": "HP",
+      "serialNumber": "87ufiu",
+      "location": "TRD",
+      "value": 567,
+      "createdBy": "Admin",
+      "createdAt": "2026-02-06T15:02:18.388Z",
+      "status": "active"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "name": "AssetGuard",
+  "description": "A comprehensive asset management system for equipment record keeping, featuring role-based access control, asset lifecycle tracking, and secure disposal workflows.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
