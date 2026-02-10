@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Asset, AssetStatus, User, UserRole } from '../types';
 import { storageService } from '../services/storage';
-import { analyzeAssetImage } from '../services/gemini';
-import { CameraCapture } from './CameraCapture';
-import { Plus, Search, Trash2, AlertCircle, Calendar, PoundSterling, MapPin, Hash, Download, Camera, Loader2, Sparkles, Upload, FileSpreadsheet, X, CheckCircle } from 'lucide-react';
+import { Plus, Search, Trash2, AlertCircle, Calendar, PoundSterling, MapPin, Hash, Download, Sparkles, Upload, FileSpreadsheet, X, CheckCircle } from 'lucide-react';
 
 interface AssetListProps {
   currentUser: User;
@@ -17,11 +15,9 @@ export const AssetList: React.FC<AssetListProps> = ({ currentUser }) => {
   // Modals state
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDisposeModal, setShowDisposeModal] = useState<string | null>(null);
-  const [showScanner, setShowScanner] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   
   // Processing state
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [importFeedback, setImportFeedback] = useState<{success: number; errors: string[]} | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -215,30 +211,6 @@ export const AssetList: React.FC<AssetListProps> = ({ currentUser }) => {
     reader.readAsText(file);
   };
 
-  const handleScanComplete = async (base64Image: string) => {
-    setShowScanner(false);
-    setIsAnalyzing(true);
-    
-    const result = await analyzeAssetImage(base64Image);
-    
-    setIsAnalyzing(false);
-    
-    if (result) {
-      const suggestedAssetId = `AS-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`;
-      setNewAsset({
-        title: result.title || '',
-        make: result.make || '',
-        serialNumber: result.serialNumber || '',
-        assetId: suggestedAssetId,
-        location: result.location || '',
-        value: result.value ? result.value.toString() : '',
-      });
-      setShowAddModal(true);
-    } else {
-      alert("Could not analyze image. Please try again or enter details manually.");
-    }
-  };
-
   const handleAddAsset = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newAsset.title || !newAsset.assetId) return;
@@ -346,13 +318,6 @@ export const AssetList: React.FC<AssetListProps> = ({ currentUser }) => {
           >
             <Download className="w-4 h-4" />
             <span>Export</span>
-          </button>
-          <button
-            onClick={() => setShowScanner(true)}
-            className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors text-sm font-medium"
-          >
-            <Camera className="w-4 h-4" />
-            <span>Scan</span>
           </button>
           <button
             onClick={() => setShowAddModal(true)}
@@ -673,26 +638,6 @@ export const AssetList: React.FC<AssetListProps> = ({ currentUser }) => {
         </div>
       )}
 
-      {/* Camera Modal */}
-      {showScanner && (
-        <CameraCapture 
-          onCapture={handleScanComplete} 
-          onClose={() => setShowScanner(false)} 
-        />
-      )}
-
-      {/* Analyzing Overlay */}
-      {isAnalyzing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
-          <div className="bg-white rounded-lg p-6 flex flex-col items-center max-w-sm w-full mx-4">
-            <Loader2 className="w-10 h-10 text-purple-600 animate-spin mb-4" />
-            <h3 className="text-lg font-medium text-gray-900">Analyzing with Gemini AI</h3>
-            <p className="text-sm text-gray-500 text-center mt-2">
-              Identifying asset details, estimating value, and suggesting location...
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
