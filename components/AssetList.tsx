@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Asset, AssetStatus, User, UserRole } from '../types';
 import { storageService } from '../services/storage';
-import { Plus, Search, Trash2, AlertCircle, Calendar, PoundSterling, MapPin, Hash, Download, Sparkles, Upload, FileSpreadsheet, X, CheckCircle } from 'lucide-react';
+import { Plus, Search, Trash2, AlertCircle, Calendar, Download, Sparkles, Upload, FileSpreadsheet, X, CheckCircle } from 'lucide-react';
 
 interface AssetListProps {
   currentUser: User;
@@ -329,74 +329,85 @@ export const AssetList: React.FC<AssetListProps> = ({ currentUser }) => {
         </div>
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-        {filteredAssets.map(asset => (
-          <div key={asset.id} className={`bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition-shadow ${asset.status === AssetStatus.DISPOSED ? 'opacity-75 bg-gray-50' : 'border-gray-200'}`}>
-            <div className="p-5">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 flex items-center">
-                    {asset.title}
-                  </h3>
-                  <p className="text-sm text-gray-500">{asset.make}</p>
-                </div>
-                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                  asset.status === AssetStatus.ACTIVE ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                }`}>
-                  {asset.status.toUpperCase()}
-                </span>
-              </div>
-              
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center text-gray-600">
-                  <Hash className="w-4 h-4 mr-2 text-gray-400" />
-                  <span className="font-mono bg-gray-100 px-1 rounded text-xs">{asset.assetId}</span>
-                  <span className="mx-2 text-gray-300">|</span>
-                  <span className="text-gray-500">SN: {asset.serialNumber}</span>
-                </div>
-                
-                <div className="flex items-center text-gray-600">
-                  <MapPin className="w-4 h-4 mr-2 text-gray-400" />
-                  {asset.location}
-                </div>
-
-                <div className="flex items-center text-gray-600">
-                  <PoundSterling className="w-4 h-4 mr-2 text-gray-400" />
-                  {new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(asset.value)}
-                </div>
-
-                <div className="pt-3 mt-3 border-t border-gray-100 flex flex-col gap-1 text-xs text-gray-500">
-                   <div className="flex items-center">
-                      <Calendar className="w-3 h-3 mr-1.5" />
-                      Recorded {new Date(asset.createdAt).toLocaleDateString()} by <strong className="ml-1 text-gray-700">{asset.createdBy}</strong>
-                   </div>
-                   {asset.status === AssetStatus.DISPOSED && (
-                     <div className="mt-2 bg-red-50 p-2 rounded text-red-700 border border-red-100">
-                       <p className="font-medium flex items-center mb-1">
-                         <Trash2 className="w-3 h-3 mr-1" />
-                         Disposed by {asset.disposedBy}
-                       </p>
-                       <p>Reason: {asset.disposalReason}</p>
-                     </div>
-                   )}
-                </div>
-              </div>
-            </div>
-            
-            {currentUser.role === UserRole.ADMIN && asset.status === AssetStatus.ACTIVE && (
-              <div className="bg-gray-50 px-5 py-3 border-t border-gray-200 flex justify-end">
-                <button
-                  onClick={() => setShowDisposeModal(asset.id)}
-                  className="text-red-600 hover:text-red-900 text-sm font-medium hover:underline flex items-center"
-                >
-                  <Trash2 className="w-4 h-4 mr-1" />
-                  Dispose Item
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
+      {/* Table */}
+      <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 text-sm">
+            <thead className="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
+              <tr>
+                <th className="px-4 py-3 text-left">Title</th>
+                <th className="px-4 py-3 text-left">Asset ID</th>
+                <th className="px-4 py-3 text-left">Make</th>
+                <th className="px-4 py-3 text-left">Serial</th>
+                <th className="px-4 py-3 text-left">Location</th>
+                <th className="px-4 py-3 text-left">Value</th>
+                <th className="px-4 py-3 text-left">Status</th>
+                <th className="px-4 py-3 text-left">Created</th>
+                <th className="px-4 py-3 text-left">Disposal</th>
+                <th className="px-4 py-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {filteredAssets.map(asset => (
+                <tr key={asset.id} className={asset.status === AssetStatus.DISPOSED ? 'bg-gray-50' : 'bg-white'}>
+                  <td className="px-4 py-3 font-medium text-gray-900">{asset.title}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-gray-700">{asset.assetId}</td>
+                  <td className="px-4 py-3 text-gray-700">{asset.make}</td>
+                  <td className="px-4 py-3 text-gray-700">{asset.serialNumber}</td>
+                  <td className="px-4 py-3 text-gray-700">{asset.location}</td>
+                  <td className="px-4 py-3 text-gray-700">
+                    {new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(asset.value)}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                      asset.status === AssetStatus.ACTIVE ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {asset.status.toUpperCase()}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-gray-700">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3 text-gray-400" />
+                      {new Date(asset.createdAt).toLocaleDateString()}
+                    </div>
+                    <div className="text-xs text-gray-500">by {asset.createdBy}</div>
+                  </td>
+                  <td className="px-4 py-3 text-gray-700">
+                    {asset.status === AssetStatus.DISPOSED ? (
+                      <div className="text-xs text-red-700">
+                        <div className="font-medium flex items-center gap-1 text-red-800">
+                          <Trash2 className="w-3 h-3" />
+                          Disposed by {asset.disposedBy}
+                        </div>
+                        <div>Reason: {asset.disposalReason || '-'}</div>
+                        {asset.disposedAt && (
+                          <div className="text-red-600">
+                            {new Date(asset.disposedAt).toLocaleDateString()}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    {currentUser.role === UserRole.ADMIN && asset.status === AssetStatus.ACTIVE ? (
+                      <button
+                        onClick={() => setShowDisposeModal(asset.id)}
+                        className="text-red-600 hover:text-red-900 text-sm font-medium hover:underline inline-flex items-center"
+                      >
+                        <Trash2 className="w-4 h-4 mr-1" />
+                        Dispose
+                      </button>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
       
       {filteredAssets.length === 0 && (
