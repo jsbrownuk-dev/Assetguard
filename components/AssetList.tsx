@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Asset, AssetStatus, User, UserRole } from '../types';
 import { storageService } from '../services/storage';
 import { analyzeAssetImage } from '../services/gemini';
@@ -36,6 +36,11 @@ export const AssetList: React.FC<AssetListProps> = ({ currentUser }) => {
   });
 
   const [disposalReason, setDisposalReason] = useState('');
+
+  const totalValue = useMemo(
+    () => assets.reduce((sum, asset) => sum + (Number.isFinite(asset.value) ? asset.value : 0), 0),
+    [assets]
+  );
 
   useEffect(() => {
     loadAssets();
@@ -292,6 +297,16 @@ export const AssetList: React.FC<AssetListProps> = ({ currentUser }) => {
 
   return (
     <div className="space-y-6">
+      <div className="sticky top-0 z-20 -mx-6 px-6 py-3 bg-gray-50/95 backdrop-blur border-b border-gray-200">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div className="text-sm text-gray-600">
+            Total Asset Value
+          </div>
+          <div className="text-xl font-semibold text-gray-900">
+            {new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(totalValue)}
+          </div>
+        </div>
+      </div>
       {/* Controls */}
       <div className="flex flex-col sm:flex-row justify-between gap-4 items-center bg-white p-4 rounded-lg shadow-sm border border-gray-100">
         <div className="flex items-center space-x-4 w-full sm:w-auto">
