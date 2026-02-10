@@ -149,14 +149,14 @@ export const AssetList: React.FC<AssetListProps> = ({ currentUser }) => {
       const text = event.target?.result as string;
       if (!text) return;
 
-      const lines = text.split('\n');
+      const lines = text.split(/\r?\n/);
       if (lines.length < 2) { // Need at least header + 1 row
         setImportFeedback({ success: 0, errors: ['File is empty or missing headers'] });
         return;
       }
 
       // Check headers
-      const headers = parseCSVLine(lines[0].toLowerCase());
+      const headers = parseCSVLine(lines[0].toLowerCase().trim());
       const requiredHeaders = ['title', 'asset id'];
       const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
 
@@ -180,10 +180,11 @@ export const AssetList: React.FC<AssetListProps> = ({ currentUser }) => {
 
       // Process rows
       for (let i = 1; i < lines.length; i++) {
-        if (!lines[i].trim()) continue;
+        const line = lines[i].trim();
+        if (!line) continue;
         
         try {
-          const row = parseCSVLine(lines[i]);
+          const row = parseCSVLine(line);
           const title = row[idx.title];
           const assetId = row[idx.assetId];
 
